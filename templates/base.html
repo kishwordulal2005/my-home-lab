@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyHomeLab Example{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/home.html">
+                <span class="brand-icon">🏠</span> MyHomeLabExample.net
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home.html">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/category.html?cat_id=1">Electronics</a></li>
+                            <li><a class="dropdown-item" href="/category.html?cat_id=2">Books</a></li>
+                            <li><a class="dropdown-item" href="/category.html?cat_id=3">Clothing</a></li>
+                            <li><a class="dropdown-item" href="/category.html?cat_id=4">Home & Garden</a></li>
+                            <li><a class="dropdown-item" href="/category.html?cat_id=5">Sports & Outdoors</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/members">Members</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user-galary-2026-event-photo.html">📸 Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-info" href="/admin/requests">📡 Requests</a>
+                    </li>
+                    {% if session.get('user_id') %}
+                    <li class="nav-item">
+                        {% if idor_uses_uuid %}
+                        <a class="nav-link" href="/profile?id={{ session.user_uuid }}">My Profile</a>
+                        {% else %}
+                        <a class="nav-link" href="/profile?id={{ session.user_id }}">My Profile</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload">Upload</a>
+                    </li>
+                    {% if session.get('is_admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="/admin">⚙ Admin</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <!-- Product Search -->
+                <form class="d-flex me-3" action="/search.html" method="GET">
+                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search products..." aria-label="Search">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
+                <!-- User Search (hits leaky /api/users/search - IDOR UUID leak) -->
+                <div class="dropdown me-3" style="position:relative">
+                    <input class="form-control form-control-sm" type="search" id="user-search"
+                           placeholder="Find user..." autocomplete="off" style="width:180px">
+                    <div id="user-search-results" class="dropdown-menu" style="width:250px"></div>
+                </div>
+                <!-- Auth -->
+                <ul class="navbar-nav">
+                    {% if session.get('user_id') %}
+                    <li class="nav-item">
+                        <span class="nav-link text-light">Hello, {{ session.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>🏠 MyHomeLabExample.net</h5>
+                    <p class="text-muted">Your trusted online marketplace for quality products.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/home.html" class="text-muted text-decoration-none">Home</a></li>
+                        <li><a href="/category.html?cat_id=1" class="text-muted text-decoration-none">Electronics</a></li>
+                        <li><a href="/search.html?q=" class="text-muted text-decoration-none">Search</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Account</h6>
+                    <ul class="list-unstyled">
+                        {% if session.get('user_id') %}
+                        <li><a href="/profile?id={{ session.user_uuid if idor_uses_uuid else session.user_id }}" class="text-muted text-decoration-none">My Profile</a></li>
+                        <li><a href="/logout" class="text-muted text-decoration-none">Logout</a></li>
+                        {% else %}
+                        <li><a href="/login" class="text-muted text-decoration-none">Login</a></li>
+                        <li><a href="/register" class="text-muted text-decoration-none">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="text-center text-muted mb-0">&copy; 2026 MyHomeLabExample.net — Fictional training site</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function() {
+        var input = document.getElementById('user-search');
+        var results = document.getElementById('user-search-results');
+        if (!input || !results) return;
+        var timer = null;
+        input.addEventListener('input', function() {
+            clearTimeout(timer);
+            var q = input.value.trim();
+            if (q.length < 2) { results.innerHTML = ''; results.classList.remove('show'); return; }
+            timer = setTimeout(function() {
+                fetch('/api/users/search?q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        results.innerHTML = '';
+                        if (data.users && data.users.length > 0) {
+                            data.users.forEach(function(u) {
+                                var a = document.createElement('a');
+                                a.className = 'dropdown-item';
+                                a.href = '/profile?id=' + u.uuid;
+                                a.textContent = u.username + ' (' + u.uuid + ')';
+                                results.appendChild(a);
+                            });
+                            results.classList.add('show');
+                        } else {
+                            results.classList.remove('show');
+                        }
+                    });
+            }, 300);
+        });
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !results.contains(e.target)) {
+                results.classList.remove('show');
+            }
+        });
+    })();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

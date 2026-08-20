@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+{% if category %}
+<h1>{{ category.name }}</h1>
+<p class="lead text-muted">{{ category.description }}</p>
+
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/product.html?id={{ product.id }}" class="text-decoration-none">{{ product.name }}</a>
+                </h5>
+                <p class="card-text text-muted">{{ product.description[:80] }}...</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="h5 text-success">${{ "%.2f"|format(product.price) }}</span>
+                    <a href="/product.html?id={{ product.id }}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not products %}
+<div class="alert alert-info">No products in this category yet.</div>
+{% endif %}
+
+{% else %}
+<div class="alert alert-warning">Category not found.</div>
+{% endif %}
+{% endblock %}

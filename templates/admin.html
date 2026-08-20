@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>⚙ Admin Panel</h1>
+        <p class="text-muted">Welcome to the administration dashboard. Manage users, products, and site settings.</p>
+
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        {% if not session.get('is_admin') %}
+        <div class="alert alert-warning">
+            <h4>Access Denied</h4>
+            <p>You are logged in as <strong>{{ session.get('username', 'unknown') }}</strong> but you need admin privileges to view this page.</p>
+            <p class="mb-0">Hint: Maybe there's a way to become admin? 🤔</p>
+        </div>
+        {% else %}
+
+        <!-- Admin Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3>{{ stats.users }}</h3>
+                        <p class="mb-0">Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>{{ stats.products }}</h3>
+                        <p class="mb-0">Products</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3>{{ stats.categories }}</h3>
+                        <p class="mb-0">Categories</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <h3>{{ stats.comments }}</h3>
+                        <p class="mb-0">Comments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">User Management</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.id }}</td>
+                            <td><a href="/user.html?name={{ u.username }}">{{ u.username }}</a></td>
+                            <td>
+                                {% if u.is_admin %}
+                                <span class="badge bg-warning text-dark">Admin</span>
+                                {% else %}
+                                <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/user.html?name={{ u.username }}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Site Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Site Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Difficulty:</strong> <code>{{ difficulty }}</code></p>
+                <p><strong>Database:</strong> <code>vulnlab.db</code> (SQLite)</p>
+                <p class="mb-0"><strong>Warning:</strong> This site is intentionally vulnerable for training purposes.</p>
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

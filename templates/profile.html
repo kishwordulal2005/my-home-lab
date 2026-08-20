@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Profile - {{ user.username }} - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+{% if user %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ user.username }}'s Profile</h1>
+
+        {% if is_own %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Edit Your Profile — Deface for Fun!</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Customize your profile page with HTML. Show off your skills!</p>
+                {% if success %}
+                <div class="alert alert-success">{{ success }}</div>
+                {% endif %}
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                <form method="POST" action="/profile/update">
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Profile Bio (HTML allowed)</label>
+                        <textarea class="form-control font-monospace" id="bio" name="bio" rows="8"
+                            placeholder="Write your bio here... HTML tags are welcome!">{{ user.bio }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Private profile data — the IDOR payoff -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Private Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered mb-0">
+                    <tr>
+                        <th style="width:150px">Email</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone</th>
+                        <td>{{ user.phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Address</th>
+                        <td>{{ user.address }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Rendered Bio/Deface -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">About {{ user.username }}</h5>
+            </div>
+            <div class="card-body">
+                <div id="profile-bio">
+                    {{ user.bio | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 80px; height: 80px; font-size: 2rem;">
+                    {{ user.username[0] | upper }}
+                </div>
+                <h4>{{ user.username }}</h4>
+                {% if user.is_admin %}
+                <span class="badge bg-warning text-dark">Admin</span>
+                {% endif %}
+                <p class="text-muted mt-2">Member</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">User not found.</div>
+{% endif %}
+{% endblock %}
