@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Home - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-banner bg-primary text-white rounded p-5 mb-4 text-center">
+    <h1 class="display-5 fw-bold">Welcome to MyHomeLabExample.net</h1>
+    <div id="welcome-banner" class="lead mt-3"></div>
+    <p class="mt-3">Discover amazing products at unbeatable prices.</p>
+    <a href="/category.html?cat_id=1" class="btn btn-light btn-lg mt-2">Shop Electronics</a>
+    <a href="/search.html?q=" class="btn btn-outline-light btn-lg mt-2">Browse All</a>
+</div>
+
+<!-- Featured Products -->
+<h2 class="mb-3">Featured Products</h2>
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/product.html?id={{ product.id }}" class="text-decoration-none">{{ product.name }}</a>
+                </h5>
+                <p class="card-text text-muted">{{ product.description[:80] }}...</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="h5 text-success">${{ "%.2f"|format(product.price) }}</span>
+                    <a href="/product.html?id={{ product.id }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Categories -->
+<h2 class="mb-3">Shop by Category</h2>
+<div class="row">
+    {% for cat in categories %}
+    <div class="col-md-4 mb-3">
+        <a href="/category.html?cat_id={{ cat.id }}" class="text-decoration-none">
+            <div class="card bg-light h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ cat.name }}</h5>
+                    <p class="card-text text-muted">{{ cat.description }}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function() {
+        var hash = decodeURIComponent(window.location.hash.substring(1));
+        if (hash) {
+            var banner = document.getElementById('welcome-banner');
+            if (banner) {
+                banner.innerHTML = 'Welcome back, ' + hash + '!';
+            }
+        }
+    })();
+</script>
+{% endblock %}

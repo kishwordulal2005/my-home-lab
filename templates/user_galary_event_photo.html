@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}User Gallery - 2026 Event Photos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>📸 User Gallery — 2026 Event Photos</h1>
+        <p class="text-muted">Share and browse event photos from the community.</p>
+
+        {% if ref_error %}
+        <div class="alert alert-danger">{{ ref_error }}</div>
+        {% endif %}
+
+        {% if log_error %}
+        <div class="alert alert-danger">{{ log_error }}</div>
+        {% endif %}
+
+        <!-- Partner promotion banner (driven by your traffic source) -->
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-dark">
+                <h6 class="mb-0">🎉 Partner Promotion — matched to your traffic source</h6>
+            </div>
+            <div class="card-body">
+                {% if campaign %}
+                    <h5 class="mb-1">#{{ campaign['id'] }} — {{ campaign['name'] }}</h5>
+                    <p class="mb-0 text-muted">{{ campaign['tagline'] }}</p>
+                    <span class="badge bg-secondary mt-2">source: {{ campaign['source'] }}</span>
+                {% else %}
+                    <p class="text-muted mb-0 small">
+                        No partner campaign matched your referral.
+                        Browse the gallery below!
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <!-- Search photos -->
+        <form method="GET" action="/user-galary-2026-event-photo.html" class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text">🔍 Filter:</span>
+                <input type="text" class="form-control" name="photo" value="{{ photo }}"
+                       placeholder="Search photos by tag or description...">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        {% if photo %}
+        <div class="alert alert-info">
+            Showing results for: <strong>{{ photo | safe }}</strong>
+        </div>
+        {% endif %}
+
+        {% if photos %}
+        <div class="row">
+            {% for p in photos %}
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p class="card-text">{{ p.content | safe }}</p>
+                        <small class="text-muted">Posted by user #{{ p.user_id }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif photo %}
+        <div class="alert alert-warning">No photos match your search.</div>
+        {% else %}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h2>🌅</h2>
+                        <p>Sunset at the lab</p>
+                        <small class="text-muted">Posted by user #1</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h2>🍕</h2>
+                        <p>Pizza night after CTF</p>
+                        <small class="text-muted">Posted by user #2</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h2>💻</h2>
+                        <p>Hackathon workspace</p>
+                        <small class="text-muted">Posted by user #3</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5>Upload Photo</h5>
+                <p class="text-muted small">Event photo sharing is coming soon!</p>
+                <hr>
+                <h6>Recent Tags</h6>
+                <span class="badge bg-primary m-1">hackathon</span>
+                <span class="badge bg-success m-1">social</span>
+                <span class="badge bg-info m-1">workspace</span>
+                <span class="badge bg-warning m-1">food</span>
+            </div>
+        </div>
+
+        <!-- Live visitor activity for this gallery -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">👥 Live Activity</h6>
+                <a href="/gallery-visits/clear" class="btn btn-sm btn-outline-secondary">Clear</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>IP</th><th>Client</th></tr></thead>
+                    <tbody>
+                        {% for v in recent_visits %}
+                        <tr>
+                            <td><code>{{ v['ip'] }}</code></td>
+                            <td class="small text-break">{{ v['user_agent'] | safe }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

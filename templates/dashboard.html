@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}My Session - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>🎛️ My Session Dashboard</h1>
+        <p class="text-muted">Personalized experience based on your browser and preferences.</p>
+
+        {% if sql_error %}
+        <div class="alert alert-danger">{{ sql_error }}</div>
+        {% endif %}
+
+        <div id="session-banner" class="alert alert-primary">
+            Welcome back! Your session theme is: <strong>{{ theme | safe }}</strong>
+        </div>
+
+        <!-- Promo check result -->
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">🎁 Active Promotion</h5></div>
+            <div class="card-body">
+                {% if promo %}
+                    <h5>{{ promo['title'] }}</h5>
+                    <p class="mb-1">{{ promo['description'] }}</p>
+                    <span class="badge bg-success">Code: {{ promo['code'] }}</span>
+                {% elif promo_code %}
+                    <p class="text-muted mb-0">Promo code <strong>"{{ promo_code }}"</strong> is not valid
+                    or has expired. Set the <code>promo_code</code> cookie and refresh.</p>
+                {% else %}
+                    <p class="text-muted mb-0">No promotion applied.
+                    Returning customers can set their saved code in the
+                    <code>promo_code</code> cookie.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Traffic source -->
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">🔗 Traffic Source</h5></div>
+            <div class="card-body">
+                {% if referer %}
+                    <p class="mb-0">You arrived here from:<br>{{ referer | safe }}</p>
+                {% else %}
+                    <p class="text-muted mb-0">Direct visit (no Referer header sent).</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Visitor log rows -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">👥 Recent Visitors To This Page</h5>
+                <a href="/visitor-log/clear" class="btn btn-sm btn-outline-secondary">Clear</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead><tr><th>#</th><th>IP</th><th>Browser / Client</th></tr></thead>
+                    <tbody>
+                        {% for v in recent_visitors %}
+                        <tr>
+                            <td>{{ v['id'] }}</td>
+                            <td><code>{{ v['ip'] }}</code></td>
+                            <td>
+                                {{ v['user_agent'] | safe }}
+                                {% if v['client_tag'] %}<span class="badge bg-info ms-2">{{ v['client_tag'] | safe }}</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Your browser fingerprint -->
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 80px; height: 80px; font-size: 2rem;">🖥️</div>
+                <h6>Your Browser</h6>
+                <p class="small text-break">{{ user_agent | safe }}</p>
+                {% if client_tag %}<span class="badge bg-dark">Tag: {{ client_tag | safe }}</span>{% endif %}
+            </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+            <div class="card-body small">
+                <h6>🍪 Preference Cookies</h6>
+                <p class="mb-1">This page reads cookies only — no URL parameters:</p>
+                <ul class="mb-2 ps-3">
+                    <li><code>theme</code> — UI theme name</li>
+                    <li><code>promo_code</code> — your saved promo code</li>
+                </ul>
+                <hr>
+                <p class="mb-0 text-muted">Tip: use your proxy's "raw request" editor to add
+                custom headers like <code>X-Client-Tag</code> or replay with modified cookies.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== RESPONSE TAB ===================== -->
+<div class="row mt-2">
+    <div class="col-12">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-response"
+                        type="button" role="tab">📡 Response</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-headers"
+                        type="button" role="tab">Request Headers</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cookies"
+                        type="button" role="tab">Cookies</button>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 rounded-bottom p-3 bg-dark text-light">
+            <div class="tab-pane fade show active" id="tab-response" role="tabpanel">
+<pre class="mb-0" style="color:#9ecbff">HTTP/1.1 200 OK
+Rendered-by: Flask ({{ difficulty }} mode)
+Inputs-consumed:
+  cookies : promo_code={{ promo_code if promo_code else '(none)' }}
+            theme={{ theme if theme else '(none)' }}
+  headers : Referer, User-Agent, X-Forwarded-For, X-Client-Tag
+Promo-match: {% if promo %}{{ promo['code'] }} → {{ promo['title'] }}{% else %}no{% endif %}</pre>
+            </div>
+            <div class="tab-pane fade" id="tab-headers" role="tabpanel">
+<pre class="mb-0" style="color:#9ecbff">{% for k, v in req_headers.items() %}{{ k }}: {{ v }}
+{% endfor %}</pre>
+            </div>
+            <div class="tab-pane fade" id="tab-cookies" role="tabpanel">
+<pre class="mb-0" style="color:#9ecbff">{% if req_cookies %}{% for k, v in req_cookies.items() %}{{ k }} = {{ v }}
+{% endfor %}{% else %}(no cookies sent){% endif %}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

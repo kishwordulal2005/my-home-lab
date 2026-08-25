@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Secure Login - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center">
+                <h4 class="mb-0">🔐 Secure Login Portal</h4>
+                <small>Two-Factor Authentication</small>
+            </div>
+            <div class="card-body p-4">
+
+                {% if result == "granted" %}
+                <div class="alert alert-success text-center">
+                    <h5>✅ Access Granted</h5>
+                    <p class="mb-0">Identity verified. Welcome to your account.</p>
+                    {% if email %}<p class="small text-muted mb-0 mt-2">Signed in as {{ email }}</p>{% endif %}
+                </div>
+
+                {% elif step == "verify" %}
+                    {% if result == "denied" %}
+                    <div class="alert alert-danger">
+                        <h6>❌ Verification Failed</h6>
+                        <p class="mb-0">{{ error }}</p>
+                    </div>
+                    {% endif %}
+
+                    <p class="text-center mb-1">
+                        We sent a 10-digit verification code to
+                    </p>
+                    <p class="text-center"><strong>{{ email }}</strong></p>
+
+                    <form method="POST" action="/secure-login.html" id="otpForm">
+                        <input type="hidden" name="step" value="verify">
+                        <input type="hidden" name="email" value="{{ email }}">
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Verification Code</label>
+                            <input type="text"
+                                   class="form-control form-control-lg text-center fs-4"
+                                   id="otp" name="otp"
+                                   placeholder="••••••••••"
+                                   maxlength="100"
+                                   autocomplete="one-time-code">
+                            <div class="form-text">Enter the 10-digit code from your email.</div>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 btn-lg">Verify Code</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="/secure-login.html" class="text-decoration-none small">Use a different email</a>
+                        <span class="text-muted mx-1">·</span>
+                        <a href="/secure-login.html" class="text-decoration-none small">Resend code</a>
+                    </div>
+
+                {% else %}
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+
+                    <p class="text-center mb-3">
+                        Enter your email address. We'll send you a one-time
+                        verification code to sign in.
+                    </p>
+
+                    <form method="POST" action="/secure-login.html">
+                        <input type="hidden" name="step" value="request">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control form-control-lg"
+                                   id="email" name="email"
+                                   placeholder="you@example.com"
+                                   autocomplete="email"
+                                   value="{{ email or '' }}">
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 btn-lg">Send Verification Code</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="/login" class="text-decoration-none small">Sign in with password instead</a>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

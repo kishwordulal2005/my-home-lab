@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Profile Settings - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>👤 Display Name Preview</h1>
+        <p class="text-muted">Preview how your display name will appear.</p>
+
+        <!-- Level selector -->
+        <div class="mb-4">
+            <a href="?lvl=1" class="btn btn-sm {% if level == 1 %}btn-primary{% else %}btn-outline-primary{% endif %}">Style 1</a>
+            <a href="?lvl=2" class="btn btn-sm {% if level == 2 %}btn-warning{% else %}btn-outline-warning{% endif %}">Style 2</a>
+            <a href="?lvl=3" class="btn btn-sm {% if level == 3 %}btn-info{% else %}btn-outline-info{% endif %}">Style 3</a>
+            <a href="?lvl=4" class="btn btn-sm {% if level == 4 %}btn-danger{% else %}btn-outline-danger{% endif %}">Style 4</a>
+        </div>
+
+        <!-- Rendered output (raw) -->
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Preview</h5></div>
+            <div class="card-body">
+                <div id="challenge-output">
+                    {{ context_html | safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Input form -->
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Your Input</h5></div>
+            <div class="card-body">
+                <form method="POST" action="/xss-challenge.html?lvl={{ level }}">
+                    <input type="hidden" name="lvl" value="{{ level }}">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Display name:</span>
+                        <input type="text" class="form-control" name="input"
+                               value="{{ user_input }}"
+                               placeholder="Enter display name...">
+                        <button class="btn btn-primary" type="submit">Preview</button>
+                    </div>
+                </form>
+
+                {% if user_input %}
+                <p class="text-muted small mb-0">Current value: <code>{{ user_input }}</code></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light mb-3">
+            <div class="card-body small text-muted">
+                <h6>About Styles</h6>
+                <p class="mb-0">Each style renders your display name in a
+                different template context. Pick one and preview your name.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

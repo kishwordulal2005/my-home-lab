@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Feedback - MyHomeLabExample.net{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>💬 Feedback</h1>
+        <p class="text-muted">We value your opinion. Tell us what you think.</p>
+
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Submit Feedback</h5></div>
+            <div class="card-body">
+                <form method="POST" action="/xss-playground.html">
+                    <div class="mb-3">
+                        <label class="form-label">Your message</label>
+                        <textarea class="form-control" name="q" rows="3"
+                                  placeholder="Type your feedback here...">{{ q }}</textarea>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        {% if q %}
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Your Submitted Message</h5></div>
+            <div class="card-body">
+                <div id="xss-output" class="p-3 border rounded bg-light">
+                    {{ q | safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="dom-output"></div>
+
+<script>
+(function() {
+    var hash = location.hash.substring(1);
+    if (hash) {
+        document.getElementById('dom-output').innerHTML = decodeURIComponent(hash);
+    }
+})();
+</script>
+{% endblock %}
